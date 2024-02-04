@@ -22,7 +22,7 @@ import {
   resizeBounds,
 } from "@/lib/utils";
 import { 
-  Camara, 
+  Camera, 
   CanvasMode, 
   CanvasState, 
   Color,
@@ -58,15 +58,14 @@ export const Canvas = ({
   const [canvasState, setCanvasState] = useState<CanvasState>({
     mode: CanvasMode.None,
   });
-  const [camara, setcamara] = useState<Camara>({ x: 0, y: 0 });
+  const [camera, setCamera] = useState<Camera>({ x: 0, y: 0 });
   const [lastUsedColor, setLastUsedColor] = useState<Color>({
     r: 0,
     g: 0,
     b: 0,
   });
 
-
-  
+ 
 
   useDisableScrollBounce();
   const history = useHistory();
@@ -281,9 +280,9 @@ export const Canvas = ({
   }, [history]);
 
   const onWheel = useCallback((e: React.WheelEvent) => {
-    setcamara((camara) => ({
-      x: camara.x - e.deltaX,
-      y: camara.y - e.deltaY,
+    setCamera((camera) => ({
+      x: camera.x - e.deltaX,
+      y: camera.y - e.deltaY,
     }));
   }, []);
 
@@ -293,7 +292,7 @@ export const Canvas = ({
   ) => {
     e.preventDefault();
 
-    const current = pointerEventToCanvasPoint(e, camara);
+    const current = pointerEventToCanvasPoint(e, camera);
 
     if (canvasState.mode === CanvasMode.Pressing) {
       startMultiSelection(current, canvasState.origin);
@@ -311,7 +310,7 @@ export const Canvas = ({
   }, 
   [
     continueDrawing,
-    camara,
+    camera,
     canvasState,
     resizeSelectedLayer,
     translateSelectedLayers,
@@ -326,7 +325,7 @@ export const Canvas = ({
   const onPointerDown = useCallback((
     e: React.PointerEvent,
   ) => {
-    const point = pointerEventToCanvasPoint(e, camara);
+    const point = pointerEventToCanvasPoint(e, camera);
 
     if (canvasState.mode === CanvasMode.Inserting) {
       return;
@@ -338,13 +337,13 @@ export const Canvas = ({
     }
 
     setCanvasState({ origin: point, mode: CanvasMode.Pressing });
-  }, [camara, canvasState.mode, setCanvasState, startDrawing]);
+  }, [camera, canvasState.mode, setCanvasState, startDrawing]);
 
   const onPointerUp = useMutation((
     {},
     e
   ) => {
-    const point = pointerEventToCanvasPoint(e, camara);
+    const point = pointerEventToCanvasPoint(e, camera);
 
     if (
       canvasState.mode === CanvasMode.None ||
@@ -368,7 +367,7 @@ export const Canvas = ({
   }, 
   [
     setCanvasState,
-    camara,
+    camera,
     canvasState,
     history,
     insertLayer,
@@ -393,7 +392,7 @@ export const Canvas = ({
     history.pause();
     e.stopPropagation();
 
-    const point = pointerEventToCanvasPoint(e, camara);
+    const point = pointerEventToCanvasPoint(e, camera);
 
     if (!self.presence.selection.includes(layerId)) {
       setMyPresence({ selection: [layerId] }, { addToHistory: true });
@@ -402,7 +401,7 @@ export const Canvas = ({
   }, 
   [
     setCanvasState,
-    camara,
+    camera,
     history,
     canvasState.mode,
   ]);
@@ -449,7 +448,6 @@ export const Canvas = ({
     }
   }, [deleteLayers, history]);
 
-
   return (
     <main
       className="h-full w-full relative bg-neutral-100 touch-none"
@@ -465,7 +463,7 @@ export const Canvas = ({
         redo={history.redo}
       />
       <SelectionTools
-        camara={camara}
+        camera={camera}
         setLastUsedColor={setLastUsedColor}
       />
       <svg
@@ -478,7 +476,7 @@ export const Canvas = ({
       >
         <g
           style={{
-            transform: `translate(${camara.x}px, ${camara.y}px)`
+            transform: `translate(${camera.x}px, ${camera.y}px)`
           }}
         >
           {layerIds.map((layerId) => (

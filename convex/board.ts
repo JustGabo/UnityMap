@@ -1,4 +1,5 @@
 import { v } from "convex/values";
+
 import { mutation, query } from "./_generated/server";
 
 const images = [
@@ -28,6 +29,8 @@ export const create = mutation({
 
     const randomImage = images[Math.floor(Math.random() * images.length)];
 
+    console.log(randomImage, "TEST")
+
     const board = await ctx.db.insert("boards", {
       title: args.title,
       orgId: args.orgId,
@@ -53,8 +56,10 @@ export const remove = mutation({
 
     const existingFavorite = await ctx.db
       .query("userFavorites")
-      .withIndex("by_user_board", (q) =>
-        q.eq("userId", userId).eq("boardId", args.id)
+      .withIndex("by_user_board", (q) => 
+        q
+          .eq("userId", userId)
+          .eq("boardId", args.id)
       )
       .unique();
 
@@ -82,7 +87,7 @@ export const update = mutation({
     }
 
     if (title.length > 60) {
-      throw new Error("Title cannot be longer than 60 characters");
+      throw new Error("Title cannot be longer than 60 characters")
     }
 
     const board = await ctx.db.patch(args.id, {
@@ -112,8 +117,10 @@ export const favorite = mutation({
 
     const existingFavorite = await ctx.db
       .query("userFavorites")
-      .withIndex("by_user_board", (q) =>
-        q.eq("userId", userId).eq("boardId", board._id)
+      .withIndex("by_user_board", (q) => 
+        q
+          .eq("userId", userId)
+          .eq("boardId", board._id)
       )
       .unique();
 
@@ -130,6 +137,7 @@ export const favorite = mutation({
     return board;
   },
 });
+
 
 export const unfavorite = mutation({
   args: { id: v.id("boards") },
@@ -150,13 +158,15 @@ export const unfavorite = mutation({
 
     const existingFavorite = await ctx.db
       .query("userFavorites")
-      .withIndex("by_user_board", (q) =>
-        q.eq("userId", userId).eq("boardId", board._id)
+      .withIndex("by_user_board", (q) => 
+        q
+          .eq("userId", userId)
+          .eq("boardId", board._id)
       )
       .unique();
 
     if (!existingFavorite) {
-      throw new Error("Favorite board not found");
+      throw new Error("Favorited board not found");
     }
 
     await ctx.db.delete(existingFavorite._id);

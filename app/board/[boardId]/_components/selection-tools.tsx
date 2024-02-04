@@ -3,8 +3,8 @@
 import { memo } from "react";
 import { BringToFront, SendToBack, Trash2 } from "lucide-react";
 
-import Hint  from "@/components/hint";
-import { Camara, Color } from "@/types/canvas";
+import { Hint } from "@/components/hint";
+import { Camera, Color } from "@/types/canvas";
 import { Button } from "@/components/ui/button";
 import { useMutation, useSelf } from "@/liveblocks.config";
 import { useDeleteLayers } from "@/hooks/use-delete-layers";
@@ -13,12 +13,12 @@ import { useSelectionBounds } from "@/hooks/use-selection-bounds";
 import { ColorPicker } from "./color-picker";
 
 interface SelectionToolsProps {
-  camara: Camara;
+  camera: Camera;
   setLastUsedColor: (color: Color) => void;
 };
 
 export const SelectionTools = memo(({
-  camara,
+  camera,
   setLastUsedColor,
 }: SelectionToolsProps) => {
   const selection = useSelf((me) => me.presence.selection);
@@ -84,8 +84,8 @@ export const SelectionTools = memo(({
     return null;
   }
 
-  const x = selectionBounds.width / 2 + selectionBounds.x + camara.x;
-  const y = selectionBounds.y + camara.y;
+  const x = selectionBounds.width / 2 + selectionBounds.x + camera.x;
+  const y = selectionBounds.y + camera.y;
 
   return (
     <div

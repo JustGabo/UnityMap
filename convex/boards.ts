@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { getAllOrThrow } from "convex-helpers/server/relationships";
 
-import { mutation, query } from "./_generated/server";
+import { query } from "./_generated/server";
 
 export const get = query({
   args: {
@@ -17,22 +17,24 @@ export const get = query({
     }
 
     if (args.favorites) {
-      const favoriteBoards = await ctx.db
+      const favoritedBoards = await ctx.db
         .query("userFavorites")
-        .withIndex("by_user_org", (q) =>
-          q.eq("userId", identity.subject).eq("orgId", args.orgId)
+        .withIndex("by_user_org", (q) => 
+          q
+            .eq("userId", identity.subject)
+            .eq("orgId", args.orgId)
         )
         .order("desc")
         .collect();
 
-      const ids = favoriteBoards.map((b) => b.boardId);
+      const ids = favoritedBoards.map((b) => b.boardId);
 
-      const boards = await getAllOrThrow(ctx.db, ids)
+      const boards = await getAllOrThrow(ctx.db, ids);
 
-      return boards.map((board)=> ({
+      return boards.map((board) => ({
         ...board,
-        isFavorite: true
-      }))
+        isFavorite: true,
+      }));
     }
 
     const title = args.search as string;
@@ -41,8 +43,10 @@ export const get = query({
     if (title) {
       boards = await ctx.db
         .query("boards")
-        .withSearchIndex("search_title", (q) =>
-          q.search("title", title).eq("orgId", args.orgId)
+        .withSearchIndex("search_title", (q) => 
+          q
+            .search("title", title)
+            .eq("orgId", args.orgId)
         )
         .collect();
     } else {
@@ -56,8 +60,10 @@ export const get = query({
     const boardsWithFavoriteRelation = boards.map((board) => {
       return ctx.db
         .query("userFavorites")
-        .withIndex("by_user_board", (q) =>
-          q.eq("userId", identity.subject).eq("boardId", board._id)
+        .withIndex("by_user_board", (q) => 
+          q
+            .eq("userId", identity.subject)
+            .eq("boardId", board._id)
         )
         .unique()
         .then((favorite) => {
@@ -69,6 +75,7 @@ export const get = query({
     });
 
     const boardsWithFavoriteBoolean = Promise.all(boardsWithFavoriteRelation);
+
     return boardsWithFavoriteBoolean;
   },
 });

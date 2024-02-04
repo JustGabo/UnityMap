@@ -1,25 +1,23 @@
-"use client"
+"use client";
 
-import {useState, useEffect} from 'react'
+import { useEffect, useState } from "react";
 
+import { RenameModal } from "@/components/modals/rename-modal";
 
-import {RenameModal} from '@/components/modals/rename-modal'
+export const ModalProvider = () => {
+  const [isMounted, setIsMounted] = useState(false);
 
-export const ModalProvider = ()=>{
-    
-    const [isMounted, setIsMounted]= useState(false)
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
-    useEffect(()=>{
-        setIsMounted(true)
-    },[])
-
-    if(!isMounted){
-        return null
-    }
-    
-    return (
-        <>
-        <RenameModal/>
-        </>
-    )
-}
+  if (!isMounted) {
+    return null;
+  }
+  
+  return (
+    <>
+      <RenameModal />
+    </>
+  );
+};
